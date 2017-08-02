@@ -7,6 +7,11 @@ import re
 import logging
 
 from django.db import models
+try:
+    from django.urls import reverse
+except ImportError:
+    # Django 1.0
+    from django.core.urlresolvers import reverse
 
 import transmissionrpc
 import dateutil.tz
@@ -135,6 +140,37 @@ class Torrent(models.Model):
     def __unicode__(self):
         return '%d: %s, %s, %s' % (
             self.base_id, self.name, self.hash, self.owners.all())
+
+    def get_absolute_url(self):
+        return reverse('torrent_torrent_detail', kwargs={'id': self.base_id})
+
+    def get_start_url(self):
+        return reverse('torrent_torrent_action', kwargs={
+            'id': self.base_id,
+            'action': 'start',
+            'hash': self.hash,
+        })
+
+    def get_stop_url(self):
+        return reverse('torrent_torrent_action', kwargs={
+            'id': self.base_id,
+            'action': 'stop',
+            'hash': self.hash,
+        })
+
+    def get_add_url(self):
+        return reverse('torrent_torrent_action', kwargs={
+            'id': self.base_id,
+            'action': 'add',
+            'hash': self.hash,
+        })
+
+    def get_remove_url(self):
+        return reverse('torrent_torrent_action', kwargs={
+            'id': self.base_id,
+            'action': 'remove',
+            'hash': self.hash,
+        })
 
     def progress_css_class(self):
         if self.status == 'downloading':

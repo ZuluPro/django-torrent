@@ -37,7 +37,8 @@ class TorrentDetail(DetailView):
 class TorrentAction(View):
     def get(self, request, *args, **kwargs):
         if not request.user.has_perm('torrent.change_torrent'):
-            return HttpResponse("You don't have the permissions to do that!")
+            msg = "You don't have the permissions to do that!"
+            return HttpResponse(msg, status=403)
         if kwargs['action'] in ['stop', 'start', 'remove']:
             try:
                 torrent = Torrent.objects.get(

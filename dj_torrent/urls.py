@@ -11,7 +11,7 @@ urlpatterns = patterns(
             TemplateView.as_view(template_name="torrent/torrent.html")),
         name='torrent',
     ),
-    url(r'^(?P<id>[0-9]+)$',
+    url(r'^(?P<id>[0-9-]+)$',
         view=login_required(TorrentDetail.as_view()),
         name='torrent_torrent_detail',
     ),
@@ -19,7 +19,7 @@ urlpatterns = patterns(
         view=login_required(TorrentList.as_view()),
         name='torrent_torrent_list',
     ),
-    url(r'^action(?:/(?P<id>[0-9]+))?/(?P<action>start|stop|add|remove)'
+    url(r'^action(?:/(?P<id>[0-9-]+))?/(?P<action>start|stop|add|remove)'
         '(?:/(?P<hash>[0-9a-f]{40}))?$',
         view=login_required(TorrentAction.as_view()),
         name='torrent_torrent_action',
