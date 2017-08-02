@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.views.generic import View, ListView, DetailView
 
-from torrent.models import Torrent, TORRENT_DIRS, DEFAULT_DIR
+from models import Torrent, TORRENT_DIRS, DEFAULT_DIR
 
 
 class TorrentList(ListView):

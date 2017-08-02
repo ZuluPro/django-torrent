@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 
-from torrent.views import TorrentList, TorrentAction, TorrentDetail
+from views import TorrentList, TorrentAction, TorrentDetail
 
 urlpatterns = patterns(
     'torrent.views',
