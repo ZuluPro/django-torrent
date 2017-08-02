@@ -129,7 +129,7 @@ class TorrentManager(models.Manager):
             logging.info('Removed %d torrent(s)', updated)
 
     def active(self):
-        qs = super(TorrentManager, self).get_query_set()
+        qs = super(TorrentManager, self).get_queryset()
         return qs.filter(deleted=False)
 
 
@@ -147,6 +147,7 @@ class Torrent(models.Model):
     objects = TorrentManager()
 
     class Meta:
+        app_label = 'dj_torrent'
         ordering = ['-date_added']
 
     def __unicode__(self):

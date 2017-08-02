@@ -1,5 +1,5 @@
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SECRET_KEY = 'p!_@owryu*t9u5b%*7%+3t^*+c@z8#8=av_8qqp@ne(0!@iino'
 
@@ -17,7 +17,7 @@ INSTALLED_APPS = [
     'dj_torrent',
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE_CLASSES = MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -32,7 +32,7 @@ ROOT_URLCONF = 'dj_torrent.tests.testproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,4 +81,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-TRANSMISSION_HOST = 'localhost'
+TRANSMISSION_USER = 'transmission'
+TRANSMISSION_PASS = '{8a7e779089b30014d99ba028d6030355217e6fe7F4q174Qg'
+TRANSMISSION_DOWNLOAD_ROOT = '/var/lib/transmission-daemon/downloads/'
