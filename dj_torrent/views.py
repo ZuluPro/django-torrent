@@ -1,7 +1,3 @@
-import os
-
-from django.conf import settings
-from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.views.generic import View, ListView, DetailView
 
@@ -46,7 +42,7 @@ class TorrentAction(View):
             try:
                 torrent = Torrent.objects.get(
                     base_id=kwargs['id'], deleted=False)
-            except Torrent.DoesNotExist as e:
+            except Torrent.DoesNotExist as err:
                 raise Http404()
 
         if kwargs['action'] == 'stop':
@@ -67,22 +63,22 @@ class TorrentAction(View):
             cats = request.GET['categories'].split()
             for pair in TORRENT_DIRS:
                 if pair[0] in cats:
-                   download_dir = pair[1]
-                   break
+                    download_dir = pair[1]
+                    break
             torrent = None
             try:
                 base = Torrent.objects.client.add_torrent(
                     magnet,
                     download_dir=download_dir
                 )
-                torrent, _c = Torrent.objects.get_or_create_from_torrentrpc(
+                torrent, _ = Torrent.objects.get_or_create_from_torrentrpc(
                     base)
                 result = base
-            except Exception as e:
+            except Exception as err:
                 try:
                     torrent = Torrent.objects.get(hash=kwargs['hash'])
-                except Torrent.DoesNotExist as e:
-                    result = e
+                except Torrent.DoesNotExist as err:
+                    result = err
                 else:
                     result = torrent
             if torrent:
