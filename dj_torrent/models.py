@@ -2,50 +2,32 @@
 Models for the Torrent app.
 """
 from datetime import timedelta, datetime
-import dateutil.tz
 import os
 import re
 import logging
 
-from django.conf import settings
 from django.db import models
 
 import transmissionrpc
+import dateutil.tz
 
-TRANSMISSION_HOST = getattr(settings, 'TRANSMISSION_HOST', 'localhost')
-TRANSMISSION_PORT = getattr(settings, 'TRANSMISSION_PORT', '9091')
-TRANSMISSION_USER = getattr(settings, 'TRANSMISSION_USER', None)
-TRANSMISSION_PASS = getattr(settings, 'TRANSMISSION_PASS', None)
-TRANSMISSION_DOWNLOAD_ROOT = getattr(settings, 'TRANSMISSION_DOWNLOAD_ROOT',
-                                     settings.MEDIA_ROOT)
-TRANSMISSION_DOWNLOAD_URL = getattr(settings, 'TRANSMISSION_DOWNLOAD_URL',
-                                    settings.MEDIA_URL)
-
-DEFAULT_DIR = os.path.join(TRANSMISSION_DOWNLOAD_ROOT, 'downloads')
-_DEFAULT_DIRS = [
-    ('music', os.path.join(TRANSMISSION_DOWNLOAD_ROOT, 'music')),
-    ('movie', os.path.join(TRANSMISSION_DOWNLOAD_ROOT, 'movies')),
-    ('tv', os.path.join(TRANSMISSION_DOWNLOAD_ROOT, 'tv')),
-    ('ebooks', os.path.join(TRANSMISSION_DOWNLOAD_ROOT, 'ebooks')),
-    ('ebook', os.path.join(TRANSMISSION_DOWNLOAD_ROOT, 'ebooks')),
-]
-TORRENT_DIRS = getattr(settings, 'TORRENT_DIRS', [])
-TORRENT_DIRS += _DEFAULT_DIRS
+from dj_torrent import settings
 
 
 class TorrentManager(models.Manager):
     """Manager class for the `Torrent` objects.
     """
     _client = None
+
     @property
     def client(self):
         if not self._client:
             try:
                 self._client = transmissionrpc.Client(
-                    address=TRANSMISSION_HOST,
-                    port=TRANSMISSION_PORT,
-                    user=TRANSMISSION_USER,
-                    password=TRANSMISSION_PASS
+                    address=settings.TRANSMISSION_HOST,
+                    port=settings.TRANSMISSION_PORT,
+                    user=settings.TRANSMISSION_USER,
+                    password=settings.TRANSMISSION_PASS
                 )
             except transmissionrpc.TransmissionError as e:
                 logging.exception(e)
@@ -81,7 +63,7 @@ class TorrentManager(models.Manager):
 
         if obj.progress == 100.0 and obj.status in ['stopped', 'seeding']:
             download_dir = obj.download_dir().rstrip(os.sep)
-            for d in TORRENT_DIRS:
+            for d in settings.TORRENT_DIRS:
                 if d[1] != download_dir:
                     # These are not the droids you are looking for, move along
                     continue
@@ -143,7 +125,7 @@ class Torrent(models.Model):
     progress = models.FloatField(default=0.0)
     date_added = models.DateTimeField(auto_now_add=True)
     deleted = models.BooleanField(default=False)
-    owners = models.ManyToManyField('auth.User', null=True, blank=True)
+    owners = models.ManyToManyField('auth.User', blank=True)
     objects = TorrentManager()
 
     class Meta:
@@ -175,8 +157,8 @@ class Torrent(models.Model):
     def file_url(self):
         return '/'.join([
             re.sub(
-                TRANSMISSION_DOWNLOAD_ROOT.rstrip(os.sep),
-                TRANSMISSION_DOWNLOAD_URL.rstrip('/'),
+                settings.TRANSMISSION_DOWNLOAD_ROOT.rstrip(os.sep),
+                settings.TRANSMISSION_DOWNLOAD_URL.rstrip('/'),
                 self.download_dir()
             ).replace('\\', '/'),
             self.name
